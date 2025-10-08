@@ -4,6 +4,8 @@ package server
 import (
 	"fmt"
 	"net"
+
+	"gokv/internal/logger"
 )
 
 // Listen for connections
@@ -12,6 +14,13 @@ func Listen() error {
 	// TODO Use a config file later to overwrite them
 	protocol := "tcp"
 	port := 5454
+	loggerChanBufferLen := 100
+
+	// Start the logger service
+	log := make(chan string, loggerChanBufferLen)
+	go logger.Log(log)
+
+	// Write this to log as well
 	portStr := fmt.Sprintf(":%v", port)
 
 	// Start listening
@@ -28,7 +37,9 @@ func Listen() error {
 		}
 	}()
 
-	fmt.Printf("Listening on %s/%v ...\n", protocol, port)
+	msg := fmt.Sprintf("Listening on %s/%v ...\n", protocol, port)
+	fmt.Printf(msg)
+	log <- msg
 
 	// Accept a single connection
 	conn, err := ln.Accept()
