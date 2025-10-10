@@ -10,15 +10,16 @@ import (
 )
 
 func main() {
-	// Default protocol and port
+	// Some defaults here
 	// TODO Use a config file later to overwrite them
 	protocol := "tcp"
 	port := 5454
 	loggerChanBufferLen := 100
+	logFilePath := "/tmp/gokv-server.log" 
 
 	// Start the logger service
 	log := make(chan string, loggerChanBufferLen)
-	go logger.Log(log)
+	go logger.Log(log, logFilePath)
 
 	fmt.Println("GoKV Server")
 
