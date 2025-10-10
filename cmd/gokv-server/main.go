@@ -24,7 +24,7 @@ func main() {
 	log := make(chan string, loggerChanBufferLen)
 	go logger.Log(log, logFilePath, logFileFlags, logFmtFlags)
 
-	fmt.Println("GoKV Server")
+	log <- "GoKV Server starting..."
 
 	if err := server.Listen(log, protocol, port); err != nil {
 		fmt.Fprintln(os.Stderr, "server error:", err)
