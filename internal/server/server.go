@@ -4,22 +4,10 @@ package server
 import (
 	"fmt"
 	"net"
-
-	"gokv/internal/logger"
 )
 
 // Listen for connections
-func Listen() error {
-	// Default protocol and port
-	// TODO Use a config file later to overwrite them
-	protocol := "tcp"
-	port := 5454
-	loggerChanBufferLen := 100
-
-	// Start the logger service
-	log := make(chan string, loggerChanBufferLen)
-	go logger.Log(log)
-
+func Listen(log chan string, protocol string, port int) error {
 	// Write this to log as well
 	portStr := fmt.Sprintf(":%v", port)
 
