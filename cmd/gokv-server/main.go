@@ -3,6 +3,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"gokv/internal/logger"
@@ -15,11 +16,13 @@ func main() {
 	protocol := "tcp"
 	port := 5454
 	loggerChanBufferLen := 100
-	logFilePath := "/tmp/gokv-server.log" 
+	logFilePath := "/tmp/gokv-server.log"
+	logFileFlags := os.O_CREATE | os.O_APPEND | os.O_WRONLY
+	logFmtFlags := log.Ldate | log.Ltime
 
 	// Start the logger service
 	log := make(chan string, loggerChanBufferLen)
-	go logger.Log(log, logFilePath)
+	go logger.Log(log, logFilePath, logFileFlags, logFmtFlags)
 
 	fmt.Println("GoKV Server")
 
