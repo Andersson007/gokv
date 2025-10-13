@@ -27,12 +27,12 @@ func BuildEntry(level LogLevel, msg string) LogEntry {
 	return LogEntry{level: level, msg: msg}
 }
 
-func logMsg(entry LogEntry) {
+func logMsg(entry LogEntry, v ...any) {
 	if entry.level < currentLevel {
 		return	// Skip logs below currentLevel
 	}
 	levelStr := [...]string{"DEBUG", "INFO", "WARNING", "ERROR"}[entry.level]
-	log.Printf("[%s] %s", levelStr, entry.msg)
+	log.Printf("[%s] %s", levelStr, fmt.Sprintf(entry.msg, v...))
 }
 
 func Log(ch chan LogEntry, logFilePath string, logFileFlags int, logFmtFlags int) {
