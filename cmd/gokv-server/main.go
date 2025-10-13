@@ -21,13 +21,13 @@ func main() {
 	logFmtFlags := log.Ldate | log.Ltime
 
 	// Start the logger service
-	log := make(chan string, loggerChanBufferLen)
+	log := make(chan logger.LogEntry, loggerChanBufferLen)
 	go logger.Log(log, logFilePath, logFileFlags, logFmtFlags)
 
-	log <- "GoKV Server starting..."
+	log <- logger.BuildEntry(logger.INFO, "GoKV Server starting...")
 
 	if err := server.Listen(log, protocol, port); err != nil {
 		fmt.Fprintln(os.Stderr, "server error:", err)
-		log <- fmt.Sprintln("Server error:", err)
+		log <- logger.BuildEntry(logger.INFO, fmt.Sprintln("Server error:", err))
 	}
 }

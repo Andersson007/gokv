@@ -4,10 +4,12 @@ package server
 import (
 	"fmt"
 	"net"
+
+	"gokv/internal/logger"
 )
 
 // Listen for connections
-func Listen(log chan string, protocol string, port int) error {
+func Listen(log chan logger.LogEntry, protocol string, port int) error {
 	// Write this to log as well
 	portStr := fmt.Sprintf(":%v", port)
 
@@ -27,7 +29,7 @@ func Listen(log chan string, protocol string, port int) error {
 
 	msg := fmt.Sprintf("Listening on %s/%v ...\n", protocol, port)
 	fmt.Printf(msg)
-	log <- msg
+	log <- logger.BuildEntry(logger.INFO, msg)
 
 	// Accept a single connection
 	conn, err := ln.Accept()

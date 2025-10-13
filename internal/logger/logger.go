@@ -7,7 +7,35 @@ import (
 	"os"
 )
 
-func Log(ch chan string, logFilePath string, logFileFlags int, logFmtFlags int) {
+type LogLevel int
+
+const (
+	DEBUG LogLevel = iota
+	INFO
+	WARNING
+	ERROR
+)
+
+type LogEntry struct {
+	level LogLevel
+	msg string
+}
+
+var currentLevel = INFO	// Change this to filter logs
+
+func BuildEntry(level LogLevel, msg string) LogEntry {
+	return LogEntry{level: level, msg: msg}
+}
+
+func logMsg(entry LogEntry) {
+	if entry.level < currentLevel {
+		return	// Skip logs below currentLevel
+	}
+	levelStr := [...]string{"DEBUG", "INFO", "WARNING", "ERROR"}[entry.level]
+	log.Printf("[%s] %s", levelStr, entry.msg)
+}
+
+func Log(ch chan LogEntry, logFilePath string, logFileFlags int, logFmtFlags int) {
 	logFile, err := os.OpenFile(logFilePath, logFileFlags, 0644)
 	if err != nil {
 		fmt.Fprintln(os.Stdout, "Error opening log file:", err)
@@ -19,8 +47,7 @@ func Log(ch chan string, logFilePath string, logFileFlags int, logFmtFlags int) 
 	// TODO Pass these flags from main
 	log.SetFlags(logFmtFlags)
 
-	for msg := range ch {
-		// TODO add different log levels
-		log.Println("Logger: ", msg)
+	for entry := range ch {
+		logMsg(entry)
 	}
 }
