@@ -17,9 +17,8 @@ func Listen(log chan logger.LogEntry, protocol string, port int) error {
 	// Start listening
 	ln, err := net.Listen(protocol, portStr)
 	if err != nil {
-		// TODO Replace it with calling a logger
-		// here and all over the file
 		fmt.Println("Server error:", err)
+		log <- msg.Set(logger.ERROR, "Server error", err)
 		return err
 	}
 	defer func() {
