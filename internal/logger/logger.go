@@ -17,22 +17,24 @@ const (
 )
 
 type LogEntry struct {
-	level LogLevel
-	msg string
+	Level LogLevel
+	Msg string
 }
 
 var currentLevel = INFO	// Change this to filter logs
 
-func BuildEntry(level LogLevel, msg string) LogEntry {
-	return LogEntry{level: level, msg: msg}
+func (e LogEntry) Set(level LogLevel, msg string) LogEntry {
+	e.Level = level
+	e.Msg = msg
+	return e
 }
 
 func logMsg(entry LogEntry, v ...any) {
-	if entry.level < currentLevel {
+	if entry.Level < currentLevel {
 		return	// Skip logs below currentLevel
 	}
-	levelStr := [...]string{"DEBUG", "INFO", "WARNING", "ERROR"}[entry.level]
-	log.Printf("[%s] %s", levelStr, fmt.Sprintf(entry.msg, v...))
+	levelStr := [...]string{"DEBUG", "INFO", "WARNING", "ERROR"}[entry.Level]
+	log.Printf("[%s] %s", levelStr, fmt.Sprintf(entry.Msg, v...))
 }
 
 func Log(ch chan LogEntry, logFilePath string, logFileFlags int, logFmtFlags int) {

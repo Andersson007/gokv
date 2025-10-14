@@ -19,15 +19,16 @@ func main() {
 	logFilePath := "/tmp/gokv-server.log"
 	logFileFlags := os.O_CREATE | os.O_APPEND | os.O_WRONLY
 	logFmtFlags := log.Ldate | log.Ltime
+	msg := logger.LogEntry{Level: logger.INFO, Msg: "Init"}
 
 	// Start the logger service
 	log := make(chan logger.LogEntry, loggerChanBufferLen)
 	go logger.Log(log, logFilePath, logFileFlags, logFmtFlags)
 
-	log <- logger.BuildEntry(logger.INFO, "GoKV Server starting...")
+	log <- msg.Set(logger.INFO, "GoKV Server starting")
 
 	if err := server.Listen(log, protocol, port); err != nil {
 		fmt.Fprintln(os.Stderr, "server error:", err)
-		log <- logger.BuildEntry(logger.INFO, fmt.Sprintln("Server error:", err))
+		log <- msg.Set(logger.INFO, fmt.Sprintln("Server error:", err))
 	}
 }

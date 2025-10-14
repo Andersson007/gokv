@@ -12,6 +12,7 @@ import (
 func Listen(log chan logger.LogEntry, protocol string, port int) error {
 	// Write this to log as well
 	portStr := fmt.Sprintf(":%v", port)
+	msg := logger.LogEntry{Level: logger.INFO, Msg: "Init"}
 
 	// Start listening
 	ln, err := net.Listen(protocol, portStr)
@@ -27,9 +28,9 @@ func Listen(log chan logger.LogEntry, protocol string, port int) error {
 		}
 	}()
 
-	msg := fmt.Sprintf("Listening on %s/%v ...\n", protocol, port)
-	fmt.Printf(msg)
-	log <- logger.BuildEntry(logger.INFO, msg)
+	welcomeMsg := fmt.Sprintf("Listening on %s/%v ...\n", protocol, port)
+	fmt.Printf(welcomeMsg)
+	log <- msg.Set(logger.INFO, welcomeMsg)
 
 	// Accept a single connection
 	conn, err := ln.Accept()
