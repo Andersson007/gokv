@@ -6,12 +6,12 @@ type cmdType int
 const (
 	GET cmdType = iota
 	SET
-	DELETE
+	DEL
 )
 
 // Command represents a parsed client command.
-type Command struct {
+type DataCmd struct {
 	ctype cmdType
-	key int64
+	key string
 	val string
 }
