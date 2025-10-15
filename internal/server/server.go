@@ -18,7 +18,7 @@ func Listen(log chan logger.LogEntry, protocol string, port int) error {
 	ln, err := net.Listen(protocol, portStr)
 	if err != nil {
 		fmt.Println("Server error:", err)
-		log <- msg.With(logger.ERROR, "Server error", err)
+		log <- msg.New(logger.ERROR, "Server error", err)
 		return err
 	}
 	defer func() {
@@ -29,7 +29,7 @@ func Listen(log chan logger.LogEntry, protocol string, port int) error {
 
 	welcomeMsg := fmt.Sprintf("Listening on %s/%v ...\n", protocol, port)
 	fmt.Printf(welcomeMsg)
-	log <- msg.With(logger.INFO, welcomeMsg)
+	log <- msg.New(logger.INFO, welcomeMsg)
 
 	// Accept a single connection
 	conn, err := ln.Accept()

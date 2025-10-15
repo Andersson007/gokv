@@ -23,7 +23,7 @@ type LogEntry struct {
 
 var currentLevel = INFO	// Change this to filter logs
 
-func (e LogEntry) With(level LogLevel, msg string, v ...any) LogEntry {
+func (e LogEntry) New(level LogLevel, msg string, v ...any) LogEntry {
 	e.Level = level
 	e.Msg = fmt.Sprintf(msg, v...)
 	return e
