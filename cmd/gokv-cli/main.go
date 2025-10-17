@@ -16,6 +16,7 @@ func main() {
 	proto := "tcp"
 	port := "5454"
 
+	// TODO move this to a function
 	conn, err := net.Dial(proto, host + ":" + port)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Connection error", err)
@@ -28,6 +29,7 @@ func main() {
 	fmt.Println("GoKV client ver.", clientVer)
 	fmt.Println("Enter commands (type 'exit' or press Ctrl+D to quit):")
 
+	// TODO move this to a function
 	for {
 		fmt.Print("> ")
 		if !scanner.Scan() {	// Read next line

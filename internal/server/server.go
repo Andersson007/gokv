@@ -4,6 +4,7 @@ package server
 import (
 	"fmt"
 	"net"
+	"os"
 
 	"gokv/internal/logger"
 )
@@ -39,10 +40,30 @@ func Listen(log chan logger.LogEntry, protocol string, port int) error {
 	}
 	defer func() {
 		if err := conn.Close(); err != nil {
-			fmt.Println("Error closing connection:", err)
+			fmt.Fprintln(os.Stderr, "Error closing connection:", err)
+			log <- msg.New(logger.ERROR, "Error closing connection:", err)
 		}
 	}()
 
 	fmt.Println("Client connected:", conn.RemoteAddr())
+
+	// TODO Move this function to handler
+	buf := make([]byte, 1024)
+	for {
+		n, err := conn.Read(buf)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "Error reading from connection:", err)
+			log <- msg.New(logger.ERROR,
+				"Error reading from connection:", err)
+			// TODO When it return from here
+			// server must continue listening
+			// TODO Handle client disconnect gracefully
+			return nil
+		}
+		fmt.Println("Client sent:", string(buf[:n]))
+
+		// Respond to the client
+		conn.Write([]byte("OK"))
+	}
 	return nil
 }
