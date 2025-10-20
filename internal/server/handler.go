@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"gokv/internal/logger"
+	"gokv/internal/protocol"
 )
 
 func HandleConn(log chan logger.LogEntry, conn net.Conn) error {
@@ -24,9 +25,19 @@ func HandleConn(log chan logger.LogEntry, conn net.Conn) error {
 			// TODO When it return from here
 			// server must continue listening
 			// TODO Handle client disconnect gracefully
+			// TODO It should get an exit code from client,
+			// write it to the log and exit
 			return nil
 		}
+
+		dc := protocol.Parse(log, string(buf[:n]))
+		fmt.Println(dc)
 		fmt.Println("Client sent:", string(buf[:n]))
+
+		//if dc.ctype == protocol.EXIT {
+		//	log <- msg.New(logger.INFO, "Client closed connection")
+		//	return nil
+		//}
 
 		// Respond to the client
 		conn.Write([]byte("OK"))

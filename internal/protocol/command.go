@@ -7,6 +7,7 @@ const (
 	GET cmdType = iota
 	SET
 	DEL
+	EXIT
 )
 
 // Command represents a parsed client command.

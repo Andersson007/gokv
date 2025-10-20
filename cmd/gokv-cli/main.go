@@ -33,6 +33,7 @@ func main() {
 	for {
 		fmt.Print("> ")
 		if !scanner.Scan() {	// Read next line
+			// TODO send a special code to the server to close connection
 			break				// EOF (including Ctrl+D) or error
 		}
 
@@ -40,6 +41,7 @@ func main() {
 
 		if input == "exit" {
 			fmt.Println("Exit")
+			// TODO send a special code to the server to close connection
 			break
 		}
 

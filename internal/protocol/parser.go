@@ -41,6 +41,11 @@ func Parse(log chan logger.LogEntry, rawCmd string) DataCmd {
 			key: parts[1],
 		}
 
+	case "EXIT":
+		return DataCmd{
+			ctype: EXIT,
+		}
+
 	default:
 		fmt.Println("Unsupported operation:", parts[0])
 		log <- msg.New(logger.ERROR, "Unsupported operation:", parts[0])
