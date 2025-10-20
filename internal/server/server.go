@@ -33,37 +33,21 @@ func Listen(log chan logger.LogEntry, protocol string, port int) error {
 	log <- msg.New(logger.INFO, welcomeMsg)
 
 	// Accept a single connection
-	conn, err := ln.Accept()
-	if err != nil {
-		fmt.Println("Server error:", err)
-		return err
-	}
-	defer func() {
-		if err := conn.Close(); err != nil {
-			fmt.Fprintln(os.Stderr, "Error closing connection:", err)
-			log <- msg.New(logger.ERROR, "Error closing connection:", err)
-		}
-	}()
-
-	fmt.Println("Client connected:", conn.RemoteAddr())
-
-	// TODO Move this function to handler
-	buf := make([]byte, 1024)
 	for {
-		n, err := conn.Read(buf)
+		conn, err := ln.Accept()
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "Error reading from connection:", err)
-			log <- msg.New(logger.ERROR,
-				"Error reading from connection:", err)
-			// TODO When it return from here
-			// server must continue listening
-			// TODO Handle client disconnect gracefully
-			return nil
+			fmt.Println("Server error:", err)
+			return err
 		}
-		fmt.Println("Client sent:", string(buf[:n]))
+		defer func() {
+			if err := conn.Close(); err != nil {
+				fmt.Fprintln(os.Stderr, "Error closing connection:", err)
+				log <- msg.New(logger.ERROR, "Error closing connection:", err)
+			}
+		}()
 
-		// Respond to the client
-		conn.Write([]byte("OK"))
+		// Launch a conn handler
+		go HandleConn(log, conn)
 	}
 	return nil
 }
