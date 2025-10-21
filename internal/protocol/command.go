@@ -12,7 +12,7 @@ const (
 
 // Command represents a parsed client command.
 type DataCmd struct {
-	ctype cmdType
-	key string
-	val string
+	Cmd cmdType
+	Key string
+	Val string
 }

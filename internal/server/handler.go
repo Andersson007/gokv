@@ -10,10 +10,26 @@ import (
 	"gokv/internal/protocol"
 )
 
+type HandlerErrorCode int
+
+const (
+	ErrClientClosedConn HandlerErrorCode = iota
+)
+
+type HandlerError struct {
+	Code HandlerErrorCode
+	Msg string
+}
+
+func (e HandlerError) Error() string {
+	return fmt.Sprintf("[%d] %s", e.Code, e.Msg)
+}
+
 func HandleConn(log chan logger.LogEntry, conn net.Conn) error {
 	msg := logger.LogEntry{Level: logger.INFO, Msg: "Init"}
 
-	fmt.Println("Client connected:", conn.RemoteAddr())
+	addr := fmt.Sprintf("%v", conn.RemoteAddr())
+	fmt.Println("Client connected:", addr)
 
 	buf := make([]byte, 1024)
 	for {
@@ -34,10 +50,15 @@ func HandleConn(log chan logger.LogEntry, conn net.Conn) error {
 		fmt.Println(dc)
 		fmt.Println("Client sent:", string(buf[:n]))
 
-		//if dc.ctype == protocol.EXIT {
-		//	log <- msg.New(logger.INFO, "Client closed connection")
-		//	return nil
-		//}
+		if dc.Cmd == protocol.EXIT {
+			fmt.Println("Connection closed by client", addr)
+			log <- msg.New(logger.INFO,
+				"Connection closed by client", addr)
+			return HandlerError{
+				Code: ErrClientClosedConn,
+				Msg: "connection closed by client",
+			}
+		}
 
 		// Respond to the client
 		conn.Write([]byte("OK"))

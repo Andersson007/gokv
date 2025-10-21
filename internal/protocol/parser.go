@@ -13,7 +13,7 @@ func Parse(log chan logger.LogEntry, rawCmd string) DataCmd {
 	parts := strings.Fields(rawCmd)	// e.g. ["SET", "key", "TO", "val"]
 	msg := logger.LogEntry{Level: logger.INFO, Msg: "Init"}
 
-	if len(parts) < 2 {
+	if len(parts) < 1 {
 		fmt.Println("Wrong command:", rawCmd)
 		log <- msg.New(logger.ERROR, "Wrong command:", rawCmd)
 		return DataCmd{}
@@ -24,26 +24,26 @@ func Parse(log chan logger.LogEntry, rawCmd string) DataCmd {
 	switch parts[0] {
 	case "SET":
 		return DataCmd{
-			ctype: SET,
-			key: parts[1],
-			val: parts[3],
+			Cmd: SET,
+			Key: parts[1],
+			Val: parts[3],
 		}
 
 	case "GET":
 		return DataCmd{
-			ctype: GET,
-			key: parts[1],
+			Cmd: GET,
+			Key: parts[1],
 		}
 
 	case "DEL":
 		return DataCmd{
-			ctype: DEL,
-			key: parts[1],
+			Cmd: DEL,
+			Key: parts[1],
 		}
 
 	case "EXIT":
 		return DataCmd{
-			ctype: EXIT,
+			Cmd: EXIT,
 		}
 
 	default:
