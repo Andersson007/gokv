@@ -4,7 +4,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"io"
 	"net"
 	"os"
 )
@@ -36,10 +35,11 @@ func main() {
 		if !scanner.Scan() {	// Read next line
 			err := scanner.Err()
 			// TODO Move closing connection to a separate func
-			if err == io.EOF {
-				_, err = conn.Write([]byte("EXIT"))
-				if err != nil {
-					fmt.Fprintln(os.Stderr, "Write error:", err)
+			if err == nil {
+				fmt.Println("\n Ctrl+D detected (EOF)")
+				_, conn_err := conn.Write([]byte("EXIT"))
+				if conn_err != nil {
+					fmt.Fprintln(os.Stderr, "Write error:", conn_err)
 					return
 				}
 			}
