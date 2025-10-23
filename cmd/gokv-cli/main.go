@@ -4,6 +4,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"net"
 	"os"
 )
@@ -33,15 +34,29 @@ func main() {
 	for {
 		fmt.Print("> ")
 		if !scanner.Scan() {	// Read next line
-			// TODO send a special code to the server to close connection
-			break				// EOF (including Ctrl+D) or error
+			err := scanner.Err()
+			// TODO Move closing connection to a separate func
+			if err == io.EOF {
+				_, err = conn.Write([]byte("EXIT"))
+				if err != nil {
+					fmt.Fprintln(os.Stderr, "Write error:", err)
+					return
+				}
+			}
+			break
 		}
 
 		input := scanner.Text()
 
 		if input == "exit" {
 			fmt.Println("Exit")
-			// TODO send a special code to the server to close connection
+			// TODO Move closing connection to a separate func
+			// Notify the server
+			_, err = conn.Write([]byte("EXIT"))
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "Write error:", err)
+				return
+			}
 			break
 		}
 
