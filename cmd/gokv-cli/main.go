@@ -43,7 +43,9 @@ func main() {
 					return
 				}
 			}
-			break
+
+			fmt.Println("Input error:", err)
+			os.Exit(1)
 		}
 
 		input := scanner.Text()
