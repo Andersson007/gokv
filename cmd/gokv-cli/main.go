@@ -62,6 +62,7 @@ func main() {
 			break
 		}
 
+		// Move this to a function
 		if input != "" {
 			fmt.Println("> You entered:", input)
 			// Send data
