@@ -8,28 +8,10 @@ import (
 	"os"
 )
 
-func main() {
-	clientVer := "0.1.0"  // TODO More idiomatic way?
-	// Some defaults here
-	// TODO Overwrite them by using CLI args
-	host := "localhost"
-	proto := "tcp"
-	port := "5454"
+func handleUserInput(scanner *bufio.Scanner, conn net.Conn) {
 
-	// TODO move this to a function
-	conn, err := net.Dial(proto, host + ":" + port)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "Connection error", err)
-		os.Exit(1)
-	}
-	defer conn.Close()
-
-	scanner := bufio.NewScanner(os.Stdin)
-
-	fmt.Println("GoKV client ver.", clientVer)
 	fmt.Println("Enter commands (type 'exit' or press Ctrl+D to quit):")
 
-	// TODO move this to a function
 	for {
 		fmt.Print("> ")
 		if !scanner.Scan() {	// Read next line
@@ -54,7 +36,7 @@ func main() {
 			fmt.Println("Exit")
 			// TODO Move closing connection to a separate func
 			// Notify the server
-			_, err = conn.Write([]byte("EXIT"))
+			_, err := conn.Write([]byte("EXIT"))
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "Write error:", err)
 				return
@@ -66,7 +48,7 @@ func main() {
 		if input != "" {
 			fmt.Println("> You entered:", input)
 			// Send data
-			_, err = conn.Write([]byte(input))
+			_, err := conn.Write([]byte(input))
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "Write error:", err)
 				return
@@ -84,6 +66,29 @@ func main() {
 			fmt.Println("> Server response:", string(buf[:n]))
 		}
 	}
+}
+
+func main() {
+	clientVer := "0.1.0"  // TODO More idiomatic way?
+	// Some defaults here
+	// TODO Overwrite them by using CLI args
+	host := "localhost"
+	proto := "tcp"
+	port := "5454"
+
+	// TODO move this to a function
+	conn, err := net.Dial(proto, host + ":" + port)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Connection error", err)
+		os.Exit(1)
+	}
+	defer conn.Close()
+
+	scanner := bufio.NewScanner(os.Stdin)
+
+	fmt.Println("GoKV client ver.", clientVer)
+
+	handleUserInput(scanner, conn)
 
 	if err := scanner.Err(); err != nil {
 		fmt.Fprintln(os.Stderr, "Error reading input:", err)
