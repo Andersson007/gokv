@@ -8,8 +8,12 @@ import (
 	"os"
 )
 
-func sendData(conn net.Conn, data string) {
-	_, err := conn.Write([]byte(data))
+type server struct {
+	conn net.Conn
+}
+
+func (s server) sendData(data string) {
+	_, err := s.conn.Write([]byte(data))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Write error:", err)
 		os.Exit(1)
@@ -20,6 +24,8 @@ func handleUserInput(scanner *bufio.Scanner, conn net.Conn) {
 
 	fmt.Println("Enter commands (type 'exit' or press Ctrl+D to quit):")
 
+	srv := server{conn: conn}
+
 	for {
 		fmt.Print("> ")
 		if !scanner.Scan() {	// Read next line
@@ -27,7 +33,7 @@ func handleUserInput(scanner *bufio.Scanner, conn net.Conn) {
 			// TODO Move closing connection to a separate func
 			if err == nil {
 				fmt.Println("\n Ctrl+D detected (EOF)")
-				sendData(conn, "EXIT")
+				srv.sendData("EXIT")
 			}
 
 			fmt.Println("Input error:", err)
@@ -40,14 +46,14 @@ func handleUserInput(scanner *bufio.Scanner, conn net.Conn) {
 			fmt.Println("Exit")
 			// TODO Move closing connection to a separate func
 			// Notify the server
-			sendData(conn, "EXIT")
+			srv.sendData("EXIT")
 		}
 
 		// Move this to a function
 		if input != "" {
 			fmt.Println("> You entered:", input)
 			// Send data
-			sendData(conn, input)
+			srv.sendData(input)
 
 			// Read response
 			buf := make([]byte, 1024)
