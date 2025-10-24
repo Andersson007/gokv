@@ -12,7 +12,14 @@ import (
 var Version = "0.1.0"
 
 var (
-	flagV = flag.Bool("v", false, "print version and exit")
+	defaultHost = "localhost"
+	defaultPort = "5454"
+)
+
+var (
+	version	= flag.Bool("version", false, "print version and exit")
+	host 	= flag.String("host", defaultHost, "server hostname")
+	port 	= flag.String("port", defaultPort, "server port")
 )
 
 type server struct {
@@ -92,17 +99,11 @@ func main() {
 	// Get CLI argument
 	flag.Parse()
 
-	if *flagV {
+	if *version {
 		printVer()
 	}
 
-	// Some defaults here
-	// TODO Overwrite them by using CLI args
-	host := "localhost"
-	proto := "tcp"
-	port := "5454"
-
-	conn, err := net.Dial(proto, host + ":" + port)
+	conn, err := net.Dial("tcp", *host + ":" + *port)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Connection error", err)
 		os.Exit(1)
