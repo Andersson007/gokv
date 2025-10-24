@@ -3,9 +3,16 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"net"
 	"os"
+)
+
+var Version = "0.1.0"
+
+var (
+	flagV = flag.Bool("v", false, "print version and exit")
 )
 
 type server struct {
@@ -76,8 +83,19 @@ func handleUserInput(scanner *bufio.Scanner, conn net.Conn) {
 	}
 }
 
+func printVer() {
+	fmt.Println("Version:", Version)
+	os.Exit(0)
+}
+
 func main() {
-	clientVer := "0.1.0"  // TODO More idiomatic way?
+	// Get CLI argument
+	flag.Parse()
+
+	if *flagV {
+		printVer()
+	}
+
 	// Some defaults here
 	// TODO Overwrite them by using CLI args
 	host := "localhost"
@@ -93,7 +111,7 @@ func main() {
 
 	scanner := bufio.NewScanner(os.Stdin)
 
-	fmt.Println("GoKV client ver.", clientVer)
+	fmt.Println("GoKV client ver.", Version)
 
 	handleUserInput(scanner, conn)
 
