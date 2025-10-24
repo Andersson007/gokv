@@ -41,7 +41,6 @@ func handleUserInput(scanner *bufio.Scanner, conn net.Conn) {
 				fmt.Fprintln(os.Stderr, "Write error:", err)
 				return
 			}
-			break
 		}
 
 		// Move this to a function
