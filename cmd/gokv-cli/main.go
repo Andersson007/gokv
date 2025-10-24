@@ -8,6 +8,14 @@ import (
 	"os"
 )
 
+func sendData(conn net.Conn, data string) {
+	_, err := conn.Write([]byte(data))
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Write error:", err)
+		os.Exit(1)
+	}
+}
+
 func handleUserInput(scanner *bufio.Scanner, conn net.Conn) {
 
 	fmt.Println("Enter commands (type 'exit' or press Ctrl+D to quit):")
@@ -19,11 +27,7 @@ func handleUserInput(scanner *bufio.Scanner, conn net.Conn) {
 			// TODO Move closing connection to a separate func
 			if err == nil {
 				fmt.Println("\n Ctrl+D detected (EOF)")
-				_, conn_err := conn.Write([]byte("EXIT"))
-				if conn_err != nil {
-					fmt.Fprintln(os.Stderr, "Write error:", conn_err)
-					return
-				}
+				sendData(conn, "EXIT")
 			}
 
 			fmt.Println("Input error:", err)
@@ -36,22 +40,14 @@ func handleUserInput(scanner *bufio.Scanner, conn net.Conn) {
 			fmt.Println("Exit")
 			// TODO Move closing connection to a separate func
 			// Notify the server
-			_, err := conn.Write([]byte("EXIT"))
-			if err != nil {
-				fmt.Fprintln(os.Stderr, "Write error:", err)
-				return
-			}
+			sendData(conn, "EXIT")
 		}
 
 		// Move this to a function
 		if input != "" {
 			fmt.Println("> You entered:", input)
 			// Send data
-			_, err := conn.Write([]byte(input))
-			if err != nil {
-				fmt.Fprintln(os.Stderr, "Write error:", err)
-				return
-			}
+			sendData(conn, input)
 
 			// Read response
 			buf := make([]byte, 1024)
@@ -75,7 +71,6 @@ func main() {
 	proto := "tcp"
 	port := "5454"
 
-	// TODO move this to a function
 	conn, err := net.Dial(proto, host + ":" + port)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Connection error", err)
