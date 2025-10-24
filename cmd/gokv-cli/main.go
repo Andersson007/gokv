@@ -20,6 +20,19 @@ func (s server) sendData(data string) {
 	}
 }
 
+func (s server) getData() string {
+	// Read response
+	buf := make([]byte, 1024)
+	n, err := s.conn.Read(buf)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Read error:", err)
+		os.Exit(1)
+	}
+
+	// Return server response as string
+	return string(buf[:n])
+}
+
 func handleUserInput(scanner *bufio.Scanner, conn net.Conn) {
 
 	fmt.Println("Enter commands (type 'exit' or press Ctrl+D to quit):")
@@ -30,9 +43,9 @@ func handleUserInput(scanner *bufio.Scanner, conn net.Conn) {
 		fmt.Print("> ")
 		if !scanner.Scan() {	// Read next line
 			err := scanner.Err()
-			// TODO Move closing connection to a separate func
 			if err == nil {
 				fmt.Println("\n Ctrl+D detected (EOF)")
+				// Close connection
 				srv.sendData("EXIT")
 			}
 
@@ -44,27 +57,21 @@ func handleUserInput(scanner *bufio.Scanner, conn net.Conn) {
 
 		if input == "exit" {
 			fmt.Println("Exit")
-			// TODO Move closing connection to a separate func
-			// Notify the server
+			// Close connection
 			srv.sendData("EXIT")
 		}
 
 		// Move this to a function
 		if input != "" {
 			fmt.Println("> You entered:", input)
-			// Send data
+			// Send data to the server
 			srv.sendData(input)
 
-			// Read response
-			buf := make([]byte, 1024)
-			n, err := conn.Read(buf)
-			if err != nil {
-				fmt.Fprintln(os.Stderr, "Read error:", err)
-				return
-			}
+			// Get response from server
+			resp := srv.getData()
 
 			// Print server response
-			fmt.Println("> Server response:", string(buf[:n]))
+			fmt.Println("> Server response:", resp)
 		}
 	}
 }
