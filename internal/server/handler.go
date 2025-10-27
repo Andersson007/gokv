@@ -8,6 +8,7 @@ import (
 
 	"gokv/internal/logger"
 	"gokv/internal/protocol"
+	"gokv/internal/storage"
 )
 
 type HandlerErrorCode int
@@ -25,7 +26,12 @@ func (e HandlerError) Error() string {
 	return fmt.Sprintf("[%d] %s", e.Code, e.Msg)
 }
 
-func HandleConn(log chan logger.LogEntry, conn net.Conn) error {
+func HandleConn(
+	log chan logger.LogEntry,
+	conn net.Conn,
+	storage storage.StorageEngine,
+) error {
+
 	msg := logger.LogEntry{Level: logger.INFO, Msg: "Init"}
 
 	addr := fmt.Sprintf("%v", conn.RemoteAddr())
@@ -46,9 +52,18 @@ func HandleConn(log chan logger.LogEntry, conn net.Conn) error {
 			return nil
 		}
 
+		fmt.Println("Client sent:", string(buf[:n]))
 		dc := protocol.Parse(log, string(buf[:n]))
 		fmt.Println(dc)
-		fmt.Println("Client sent:", string(buf[:n]))
+		// TODO Move to the switch to a function
+		switch dc.Cmd {
+		case protocol.GET:
+			storage.Get(dc.Key)
+		case protocol.SET:
+			storage.Set(dc.Key, dc.Val)
+		case protocol.DEL:
+			storage.Del(dc.Key)
+		}
 
 		if dc.Cmd == protocol.EXIT {
 			fmt.Println("Connection closed by client", addr)

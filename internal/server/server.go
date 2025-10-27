@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"gokv/internal/logger"
+	"gokv/internal/storage"
 )
 
 // Listen for connections
@@ -14,6 +15,10 @@ func Listen(log chan logger.LogEntry, protocol string, port int) error {
 	// Write this to log as well
 	portStr := fmt.Sprintf(":%v", port)
 	msg := logger.LogEntry{Level: logger.INFO, Msg: "Init"}
+
+	// Initialize storage
+	// TODO introduce other storage types
+	storage := storage.NewInMemStorage()
 
 	// Start listening
 	ln, err := net.Listen(protocol, portStr)
@@ -47,7 +52,7 @@ func Listen(log chan logger.LogEntry, protocol string, port int) error {
 		}()
 
 		// Launch a conn handler
-		go HandleConn(log, conn)
+		go HandleConn(log, conn, storage)
 	}
 	return nil
 }
