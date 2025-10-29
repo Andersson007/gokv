@@ -29,7 +29,7 @@ func (e HandlerError) Error() string {
 func HandleConn(
 	log chan logger.LogEntry,
 	conn net.Conn,
-	storage storage.StorageEngine,
+	storage storage.StorageEnginer,
 ) error {
 
 	msg := logger.LogEntry{Level: logger.INFO, Msg: "Init"}

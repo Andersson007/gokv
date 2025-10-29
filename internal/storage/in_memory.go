@@ -7,7 +7,7 @@ import (
 	"sync"
 )
 
-// It implements the StorageEngine interface.
+// It implements the StorageEnginer interface.
 type InMemStorage struct {
 	mu	 sync.RWMutex
 	data map[string]string
