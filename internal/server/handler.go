@@ -44,11 +44,6 @@ func HandleConn(
 			fmt.Fprintln(os.Stderr, "Error reading from connection:", err)
 			log <- msg.New(logger.ERROR,
 				"Error reading from connection:", err)
-			// TODO When it return from here
-			// server must continue listening
-			// TODO Handle client disconnect gracefully
-			// TODO It should get an exit code from client,
-			// write it to the log and exit
 			return nil
 		}
 

@@ -73,6 +73,7 @@ func handleUserInput(scanner *bufio.Scanner, conn net.Conn) {
 			fmt.Println("Exit")
 			// Close connection
 			srv.sendData("EXIT")
+			os.Exit(0)
 		}
 
 		// Move this to a function
