@@ -2,6 +2,7 @@
 package server
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -29,7 +30,7 @@ func (e HandlerError) Error() string {
 func HandleConn(
 	log chan logger.LogEntry,
 	conn net.Conn,
-	storage storage.StorageEnginer,
+	store storage.StorageEnginer,
 ) error {
 
 	msg := logger.LogEntry{Level: logger.INFO, Msg: "Init"}
@@ -53,11 +54,27 @@ func HandleConn(
 		// TODO Move to the switch to a function
 		switch dc.Cmd {
 		case protocol.GET:
-			storage.Get(dc.Key)
+			val, err := store.Get(dc.Key)
+			if err != nil {
+				if errors.Is(err, storage.ErrKeyNotFound) {
+					// TODO Should I just remove this line or log this?
+					fmt.Println("The key doesn't exist:", dc.Key)
+					conn.Write([]byte("The key doesn't exist: " + dc.Key))
+    			} else {
+					// TODO Should I just remove this line or log this?
+        			fmt.Println("Error:", err)
+					conn.Write([]byte("Error: " + dc.Key))
+    			}
+			} else {
+				// If not errors, send the val to the client
+				conn.Write([]byte(val))
+			}
 		case protocol.SET:
-			storage.Set(dc.Key, dc.Val)
+			store.Set(dc.Key, dc.Val)
+			conn.Write([]byte("SET"))
 		case protocol.DEL:
-			storage.Del(dc.Key)
+			store.Del(dc.Key)
+			conn.Write([]byte("DELETED"))
 		}
 
 		if dc.Cmd == protocol.EXIT {
@@ -69,9 +86,6 @@ func HandleConn(
 				Msg: "connection closed by client",
 			}
 		}
-
-		// Respond to the client
-		conn.Write([]byte("OK"))
 	}
 	return nil
 }
