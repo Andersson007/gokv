@@ -57,12 +57,8 @@ func HandleConn(
 			val, err := store.Get(dc.Key)
 			if err != nil {
 				if errors.Is(err, storage.ErrKeyNotFound) {
-					// TODO Should I just remove this line or log this?
-					fmt.Println("The key doesn't exist:", dc.Key)
 					conn.Write([]byte("The key doesn't exist: " + dc.Key))
     			} else {
-					// TODO Should I just remove this line or log this?
-        			fmt.Println("Error:", err)
 					conn.Write([]byte("Error: " + dc.Key))
     			}
 			} else {
