@@ -48,9 +48,8 @@ func HandleConn(
 			return nil
 		}
 
-		fmt.Println("Client sent:", string(buf[:n]))
 		dc := protocol.Parse(log, string(buf[:n]))
-		fmt.Println(dc)
+
 		// TODO Move to the switch to a function
 		switch dc.Cmd {
 		case protocol.GET:
