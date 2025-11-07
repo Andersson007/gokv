@@ -4,8 +4,8 @@ package server
 import (
 	"errors"
 	"fmt"
+	"io"
 	"net"
-	"os"
 
 	"gokv/internal/logger"
 	"gokv/internal/protocol"
@@ -57,19 +57,9 @@ func respondToClient(
 	}
 
 	if dc.Cmd == protocol.EXIT {
-		fmt.Println("Connection closed by client", addr)
 		log <- msg.New(logger.INFO,
-			"Connection closed by client", addr)
+			"Received EXIT from client")
 
-		// TODO This is discarded now. Think of creating a channel
-		// to return errors from handler goroutines if needed
-		// TODO UPDATE: I know the case. When connection is closed
-		// by the client, server Listen() reports the error
-		// "Error reading from connection: EOF". The solution could
-		// be 1. Creating a channel 2. Assigning ID to each
-		// handler goroutine 3. There'll be a check in the reading
-		// from conn loop checking if the gorouting has reported
-		// that connection was closed by the client.
 		return HandlerError{
 			Code: ErrClientClosedConn,
 			Msg: "connection closed by client",
@@ -93,16 +83,19 @@ func HandleConn(
 	for {
 		n, err := conn.Read(buf)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "Error reading from connection:", err)
-			log <- msg.New(logger.ERROR,
-				"Error reading from connection:", err)
+			if err == io.EOF {
+				log <- msg.New(logger.INFO,
+					"Connection closed by client")
+
+			} else {
+				log <- msg.New(logger.ERROR,
+					"Error reading from connection:", err)
+			}
 			return nil
 		}
 
 		dc := protocol.Parse(log, string(buf[:n]))
 
-		// TODO This function returns an error.
-		// Think if you need it. TODO see comments in the function
 		respondToClient(log, conn, store, dc, addr, msg)
 	}
 	return nil
