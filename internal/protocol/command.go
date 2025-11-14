@@ -10,7 +10,7 @@ const (
 	EXIT
 )
 
-// Command represents a parsed client command.
+// Command represents a parsed client command
 type DataCmd struct {
 	Cmd cmdType
 	Key string

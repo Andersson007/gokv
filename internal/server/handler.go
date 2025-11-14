@@ -35,6 +35,7 @@ func respondToClient(
 	addr string,
 	msg logger.LogEntry,
 ) error {
+
 	switch dc.Cmd {
 	case protocol.GET:
 		val, err := store.Get(dc.Key)
@@ -98,5 +99,6 @@ func HandleConn(
 
 		respondToClient(log, conn, store, dc, addr, msg)
 	}
+	// TODO Should you return errors from here whatsoever?
 	return nil
 }
