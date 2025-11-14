@@ -37,7 +37,12 @@ func logMsg(entry LogEntry, v ...any) {
 	log.Printf("[%s] %s", levelStr, fmt.Sprintf(entry.Msg, v...))
 }
 
-func Log(ch chan LogEntry, logFilePath string, logFileFlags int, logFmtFlags int) {
+func Log(
+	ch chan LogEntry,
+	logFilePath string,
+	logFileFlags int,
+	logFmtFlags int,
+) {
 	logFile, err := os.OpenFile(logFilePath, logFileFlags, 0644)
 	if err != nil {
 		fmt.Fprintln(os.Stdout, "Error opening log file:", err)
